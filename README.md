@@ -1,4 +1,7 @@
-# PDF to XLSX
+# PDF to XLSX (program lokalny)
+
+Program **lokalny** — działa w całości na Twoim komputerze (Python + tkinter),
+nie łączy się z internetem i nigdzie nie wysyła Twoich plików PDF ani danych.
 
 Program z GUI (tkinter) do wyciągania tabel z plików PDF do Excela (.xlsx).
 Radzi sobie z PDF-ami bez linii siatki tabeli — dane ułożone "wierszami"

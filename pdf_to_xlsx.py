@@ -5,6 +5,7 @@
 Uruchomienie: python pdf_to_xlsx.py            (GUI)
               python pdf_to_xlsx.py --selftest (test logiki)
 """
+import json
 import os
 import re
 import sys
@@ -180,8 +181,9 @@ def gui():
     root.geometry("780x580")
     pad = dict(padx=6, pady=3)
 
-    v_in = tk.StringVar()
-    v_out = tk.StringVar()
+    cfg = load_config()
+    v_in = tk.StringVar(value=cfg.get("last_in", ""))
+    v_out = tk.StringVar(value=cfg.get("last_out", ""))
     v_mode = tk.StringVar(value="auto")
     v_top = tk.StringVar(value="0")
     v_bot = tk.StringVar(value="0")
@@ -277,7 +279,34 @@ def gui():
         threading.Thread(target=work, daemon=True).start()
 
     btn.config(command=start)
+
+    def on_close():
+        save_config({"last_in": v_in.get(), "last_out": v_out.get()})
+        root.destroy()
+
+    root.protocol("WM_DELETE_WINDOW", on_close)
     root.mainloop()
+
+
+# ------------------------------------------------------------------ config ----
+
+CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
+
+
+def load_config():
+    try:
+        with open(CONFIG_PATH, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {}
+
+
+def save_config(cfg):
+    try:
+        with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+            json.dump(cfg, f, ensure_ascii=False, indent=2)
+    except OSError:
+        pass
 
 
 # --------------------------------------------------------------- selftest ----

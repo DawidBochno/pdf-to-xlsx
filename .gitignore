@@ -1,3 +1,7 @@
 __pycache__/
 *.pyc
+config.json
 *.xlsx
+*.pdf
+!Input/przyklad.pdf
+!Output/przyklad.xlsx
