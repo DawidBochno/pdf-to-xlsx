@@ -82,16 +82,37 @@ def page_rows(page, mode, ytol, min_gap):
 
 
 def drop_repeats(pages_rows, min_frac=0.6):
-    """Usuwa wiersze powtarzajace sie na wiekszosci stron (naglowki/stopki)."""
+    """Usuwa naglowki/stopki: wiersze z gory lub z dolu strony, ktore na
+    wiekszosci stron stoja na tej samej pozycji. Wiersze ze srodka strony
+    (dane) zostaja, nawet jesli sie powtarzaja. Zwraca (strony, usuniete)."""
     n = len(pages_rows)
     if n < 3:
-        return pages_rows
+        return pages_rows, []
     seen = Counter()
     for rows in pages_rows:
-        for sig in {tuple(r) for r in rows}:
-            seen[sig] += 1
+        for i, r in enumerate(rows):
+            seen["t", i, tuple(r)] += 1
+            seen["b", len(rows) - 1 - i, tuple(r)] += 1
     thr = max(2, int(n * min_frac))
-    return [[r for r in rows if seen[tuple(r)] < thr] for rows in pages_rows]
+    edges = []
+    for rows in pages_rows:
+        a, b = 0, len(rows)
+        while a < b and seen["t", a, tuple(rows[a])] >= thr:
+            a += 1
+        # stopka: na KAZDEJ stronie (ostatnia strona listy zwykle konczy sie
+        # innym wierszem danych niz pelne strony)
+        while b > a and seen["b", len(rows) - b, tuple(rows[b - 1])] >= n:
+            b -= 1
+        edges.append((a, b))
+    # wiersz, ktory gdziekolwiek wystepuje tez w srodku strony, to dane
+    middle = {tuple(r) for rows, (a, b) in zip(pages_rows, edges) for r in rows[a:b]}
+    out, removed = [], []
+    for rows, (a, b) in zip(pages_rows, edges):
+        keep = []
+        for i, r in enumerate(rows):
+            (keep if a <= i < b or tuple(r) in middle else removed).append(r)
+        out.append(keep)
+    return out, removed
 
 
 NUM = re.compile(r"^-?\d{1,3}(?:[  ]\d{3})*(?:[.,]\d+)?$|^-?\d+(?:[.,]\d+)?$")
@@ -100,6 +121,11 @@ ILLEGAL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f]")
 
 def cast(v, numbers):
     s = ILLEGAL.sub("", v).strip()
+    digits = re.sub(r"\D", "", re.split(r"[.,]", s)[0])
+    # numery kont (>15 cyfr Excel traci) i kody z zerem wiodacym zostaja tekstem
+
+    if len(digits) > 15 or (len(digits) > 1 and digits[0] == "0"):
+        return s
     if numbers and NUM.match(s):
         try:
             return float(s.replace(" ", "").replace(" ", "").replace(",", "."))
@@ -124,10 +150,10 @@ def convert(pdf_path, out_dir, o, log=print):
             log("  strona %d: %d wierszy" % (i, len(rows)))
 
     if o["drop_repeats"]:
-        before = sum(len(r) for r in pages_rows)
-        pages_rows = drop_repeats(pages_rows)
-        log("  usunieto powtarzalne naglowki/stopki: %d wierszy"
-            % (before - sum(len(r) for r in pages_rows)))
+        pages_rows, removed = drop_repeats(pages_rows)
+        log("  usunieto powtarzalne naglowki/stopki: %d wierszy" % len(removed))
+        for r in dict.fromkeys(map(tuple, removed)):
+            log("    - " + " | ".join(r))
 
     wb = Workbook()
     wb.remove(wb.active)
@@ -334,8 +360,18 @@ def selftest():
                                           ["Ala", "Nowak", "7"]]
     assert cast("1 234,56", True) == 1234.56
     assert cast("A1", True) == "A1"
-    pr = drop_repeats([[["H"], ["a"]], [["H"], ["b"]], [["H"], ["c"]]])
-    assert pr == [[["a"]], [["b"]], [["c"]]], pr
+    assert cast("0,50", True) == 0.5 and cast("-12.5", True) == -12.5
+    for s in ("61109010140000071219812874", "00123", "007"):  # IBAN, kody
+        assert cast(s, True) == s, cast(s, True)
+    pr, rm = drop_repeats([[["H"], ["a"]], [["H"], ["b"]], [["H"], ["c"]]])
+    assert pr == [[["a"]], [["b"]], [["c"]]] and rm == [["H"]] * 3, pr
+    # powtarzajacy sie wiersz danych w srodku strony zostaje
+    d = ["Dodatek", "200,00"]
+    e = ["2", "Dodatek", "200,00"]  # ostatni wiersz danych pelnych stron
+    pages = [[["Lista"], [n], d, [n + "2"], e, ["Str."]] for n in "XYZ"]
+    pages.append([["Lista"], ["V"], d, ["Str."]])
+    pr, rm = drop_repeats(pages)
+    assert pr == [p[1:-1] for p in pages] and rm == [["Lista"], ["Str."]] * 4, pr
     print("selftest OK")
 
 

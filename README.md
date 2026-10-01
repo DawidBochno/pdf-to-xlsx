@@ -39,12 +39,15 @@ W GUI wskaż:
 - **Min. przerwa kolumny [pt]** — minimalna pionowa przerwa bez tekstu,
   żeby uznać ją za granicę kolumny (zwiększ, jeśli kolumny dzielą się
   za często; zmniejsz, jeśli sąsiednie kolumny się sklejają).
-- **Usuń powtarzalne nagłówki/stopki** — automatycznie usuwa wiersze,
-  które powtarzają się identycznie na większości stron (np. tytuł
-  dokumentu i stopka drukowane na każdej stronie).
+- **Usuń powtarzalne nagłówki/stopki** — usuwa wiersze z góry strony,
+  które na większości stron stoją w tym samym miejscu (np. tytuł dokumentu,
+  nagłówek tabeli), i z dołu strony, jeśli są na każdej stronie (stopka). Powtarzające się wiersze danych ze środka strony
+  zostają. Usunięte wiersze są wypisane w logu.
 - **Wszystkie strony na jednym arkuszu** — inaczej każda strona trafia
   do osobnego arkusza w tym samym pliku .xlsx.
 - **Konwertuj liczby** — zamienia tekst typu `1 234,56` na liczbę Excela.
+  Numery kont (ponad 15 cyfr) i kody z zerem na początku (`007`, `00123`)
+  zostają tekstem, żeby nic nie zginęło.
 
 ## Ograniczenia
 
