@@ -1,21 +1,32 @@
 # PDF to XLSX (program lokalny)
 
 Program **lokalny** — działa w całości na Twoim komputerze (Python + tkinter),
-nie łączy się z internetem i nigdzie nie wysyła Twoich plików PDF ani danych.
+nigdzie nie wysyła Twoich plików PDF ani danych. Z internetem łączy się
+tylko po to, żeby sprawdzić [aktualizacje](#aktualizacje).
 
 Program z GUI (tkinter) do wyciągania tabel z plików PDF do Excela (.xlsx).
 Radzi sobie z PDF-ami bez linii siatki tabeli — dane ułożone "wierszami"
 (wiersz, mały odstęp, kolejny wiersz) są rozpoznawane po współrzędnych
 tekstu, nie po liniach.
 
-## Szybki start
+![Okno programu](docs/okno.png)
 
-1. `install.bat` — instaluje Pythona (jeśli brak, prosi o ręczną instalację)
-   oraz biblioteki `pdfplumber` i `openpyxl`, uruchamia self-test.
-2. `uruchom.bat` — otwiera GUI.
+## Instalacja (jednorazowo)
 
-Wymaga zainstalowanego Pythona 3.9+ z opcją "Add python.exe to PATH" oraz
-"tcl/tk and IDLE" (potrzebne do GUI).
+1. **Python** — pobierz z [python.org](https://www.python.org/downloads/windows/)
+   (wersja 3.9 lub nowsza). W instalatorze zaznacz **„Add python.exe to PATH”**.
+   Opcja „tcl/tk and IDLE” jest zaznaczona domyślnie i musi taka zostać.
+   Uprawnienia administratora nie są potrzebne.
+2. **Program** — na stronie [github.com/DawidBochno/pdf-to-xlsx](https://github.com/DawidBochno/pdf-to-xlsx)
+   kliknij zielony przycisk **Code → Download ZIP**. Rozpakuj archiwum,
+   np. do `C:\Programy\PDF to XLSX`. Nie uruchamiaj programu z wnętrza ZIP-a.
+3. Kliknij dwukrotnie **`install.bat`**. Instaluje biblioteki `pdfplumber` i `openpyxl` (potrzebny internet) i uruchamia test. Na końcu pojawia się
+   **„selftest OK”**, co znaczy, że wszystko działa.
+   Jeśli Windows pokaże „System Windows ochronił ten komputer”, kliknij
+   **Więcej informacji → Uruchom mimo to**.
+4. Program uruchamia się plikiem **`uruchom.bat`**. Wygodnie jest zrobić
+   skrót na pulpicie: prawy przycisk na `uruchom.bat` → **Wyślij do →
+   Pulpit (utwórz skrót)**.
 
 ## Użycie
 
@@ -48,6 +59,22 @@ W GUI wskaż:
 - **Konwertuj liczby** — zamienia tekst typu `1 234,56` na liczbę Excela.
   Numery kont (ponad 15 cyfr) i kody z zerem na początku (`007`, `00123`)
   zostają tekstem, żeby nic nie zginęło.
+
+## Aktualizacje
+
+Po uruchomieniu program sprawdza w tle na GitHubie, czy jest nowa wersja.
+Jeśli jest, pyta **„Pobrać i zainstalować teraz?”**. Pobierane są tylko
+zmienione pliki programu. Foldery `INPUT`, `OUTPUT`, ustawienia i pliki
+w `przyklad/` nie są nadpisywane. Po aktualizacji zamknij i uruchom program ponownie. Jeśli program
+o to poprosi, uruchom też raz `install.bat` (zmieniły się biblioteki).
+
+- Do GitHuba trafia tylko zapytanie o listę plików programu, **nigdy
+  dokumenty ani dane**.
+- Bez internetu albo przy blokadzie (np. UTM) program działa normalnie,
+  bez żadnego komunikatu.
+- **Wyłączenie** (np. gdy programy aktualizuje dział IT): utwórz w folderze
+  programu pusty plik o nazwie `NIE_AKTUALIZUJ`.
+- Kopię pobraną przez `git clone` aktualizuje się poleceniem `git pull`.
 
 ## Ograniczenia
 

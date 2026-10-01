@@ -311,6 +311,8 @@ def gui():
         root.destroy()
 
     root.protocol("WM_DELETE_WINDOW", on_close)
+    import aktualizacja
+    aktualizacja.start(root, "DawidBochno/pdf-to-xlsx", "master", "pdf_to_xlsx.py")
     root.mainloop()
 
 
@@ -372,6 +374,8 @@ def selftest():
     pages.append([["Lista"], ["V"], d, ["Str."]])
     pr, rm = drop_repeats(pages)
     assert pr == [p[1:-1] for p in pages] and rm == [["Lista"], ["Str."]] * 4, pr
+    import aktualizacja
+    aktualizacja.selftest()
     print("selftest OK")
 
 
