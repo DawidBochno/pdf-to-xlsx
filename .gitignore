@@ -5,3 +5,6 @@ config.json
 *.pdf
 !Input/przyklad.pdf
 !Output/przyklad.xlsx
+
+# prywatne pliki robocze - nie wysylamy na GitHub
+pliki testowe/
